@@ -51,7 +51,7 @@ class Rudr_SWC_JE {
 		}
 		// if no jet engine installed
 		if( ! function_exists( 'jet_engine' ) ) {
-			return $meta_value;
+			return $data;
 		}
 		// just in case
 		if( empty( $data[ 'id' ] ) ) {
