@@ -4,7 +4,7 @@
  * Author: Misha Rudrastyh
  * Author URI: https://rudrastyh.com
  * Description: Provides better compatibility with JetEngine.
- * Version: 1.0
+ * Version: 1.1
  * Plugin URI: https://rudrastyh.com/support/jet-engine-compatibility
  */
 
@@ -95,6 +95,11 @@ class Rudr_SWC_JE {
 			}
 			case 'posts' : {
 				$meta_value = $this->process_posts_field( $meta_value, $field, $blog );
+				break;
+			}
+			// validate field type because it should be must be integer
+			case 'date' : {
+				$meta_value = isset( $field[ 'is_timestamp' ] ) && $field[ 'is_timestamp' ] ? absint( $meta_value ) : $meta_value;
 				break;
 			}
 		}
