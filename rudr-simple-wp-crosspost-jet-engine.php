@@ -4,7 +4,7 @@
  * Author: Misha Rudrastyh
  * Author URI: https://rudrastyh.com
  * Description: Provides better compatibility with JetEngine.
- * Version: 1.1
+ * Version: 1.2
  * Plugin URI: https://rudrastyh.com/support/jet-engine-compatibility
  */
 
@@ -77,6 +77,27 @@ class Rudr_SWC_JE {
 
 			$data[ 'meta' ][ $meta_key ] = $this->process_field_by_type( $meta_value, $field, $blog );
 		}
+		// $data[ 'meta' ][ 'some-advanced-date' ] = array(
+		// 	'rrule' => 'DTSTART=20251031T000000Z;0TEND=20251026T0000007;FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU;COUNT=5',
+		// 	'dates' => array(
+		// 		array(
+		// 			'start' => '1762128000',
+		// 			'end' => '1761696000',
+		// 		),
+		// 		array(
+		// 			'start' => '1762214400',
+		// 			'end' => '1761782400',
+		// 		),
+		// 		array(
+		// 			'start' => '1762732800',
+		// 			'end' => '1762300800',
+		// 		),
+		// 		array(
+		// 			'start' => '1762819200',
+		// 			'end' => '1762819200',
+		// 		),
+		// 	),
+		// );
 //echo '<pre>';print_r( $data );exit;
 		return $data;
 
@@ -131,7 +152,7 @@ class Rudr_SWC_JE {
 		if( 'both' === $field[ 'value_format' ] ) {
 			if( isset( $upload[ 'id' ] ) && $upload[ 'id' ] ) {
 				$meta_value = array(
-					'id' => $upload[ 'id' ],
+					'id' => (int) $upload[ 'id' ],
 					'url' => $upload[ 'url' ],
 				);
 			} else {
@@ -139,7 +160,7 @@ class Rudr_SWC_JE {
 			}
 		} else {
 			if( isset( $upload[ 'id' ] ) && $upload[ 'id' ] ) {
-				$meta_value = $upload[ 'id' ];
+				$meta_value = (int) $upload[ 'id' ];
 			} else {
 				$meta_value = 0;
 			}
@@ -170,7 +191,7 @@ class Rudr_SWC_JE {
 			$upload = Rudr_Simple_WP_Crosspost::maybe_crosspost_image( $id, $blog );
 			if( isset( $upload[ 'id' ] ) && $upload[ 'id' ] ) {
 				return array(
-					'id' => $upload[ 'id' ],
+					'id' => (int) $upload[ 'id' ],
 					'url' => $upload[ 'url' ],
 				);
 			}
@@ -197,11 +218,11 @@ class Rudr_SWC_JE {
 				$product = wc_get_product( $id );
 				// no need to check connection type, this method does that
 				if( $product && ( $new_id = Rudr_Simple_Woo_Crosspost::is_crossposted_product( $product, $blog ) ) ) {
-					$crossposted_ids[] = $new_id;
+					$crossposted_ids[] = (int) $new_id;
 				}
 			} else {
 				if( $new_id = Rudr_Simple_WP_Crosspost::is_crossposted( $id, $blog_id ) ) {
-					$crossposted_ids[] = $new_id;
+					$crossposted_ids[] = (int) $new_id;
 				}
 			}
 		}
