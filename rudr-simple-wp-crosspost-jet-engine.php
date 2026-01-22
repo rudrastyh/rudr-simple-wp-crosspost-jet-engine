@@ -4,7 +4,7 @@
  * Author: Misha Rudrastyh
  * Author URI: https://rudrastyh.com
  * Description: Provides better compatibility with JetEngine.
- * Version: 1.2
+ * Version: 1.3
  * Plugin URI: https://rudrastyh.com/support/jet-engine-compatibility
  */
 
@@ -75,6 +75,14 @@ class Rudr_SWC_JE {
 				continue;
 			}
 
+			// format advanced date field
+			if( 'advanced-date' === $field[ 'type' ] ) {
+				unset( $data[ 'meta' ][ $meta_key ] );
+				if( isset( $data[ 'meta' ][ $meta_key . '__end_date' ] ) ) {
+					unset( $data[ 'meta' ][ $meta_key . '__end_date' ] );
+				}
+			}
+
 			$data[ 'meta' ][ $meta_key ] = $this->process_field_by_type( $meta_value, $field, $blog );
 		}
 		// $data[ 'meta' ][ 'some-advanced-date' ] = array(
@@ -99,6 +107,10 @@ class Rudr_SWC_JE {
 		// 	),
 		// );
 //echo '<pre>';print_r( $data );exit;
+		// ob_start();
+		// var_dump($data);
+		// $output = ob_get_clean();
+		// file_put_contents( __DIR__ . '/log2.txt', print_r( $output, true ) );
 		return $data;
 
 	}
@@ -118,11 +130,13 @@ class Rudr_SWC_JE {
 				$meta_value = $this->process_posts_field( $meta_value, $field, $blog );
 				break;
 			}
-			// validate field type because it should be must be integer
 			case 'date' : {
-				$meta_value = isset( $field[ 'is_timestamp' ] ) && $field[ 'is_timestamp' ] ? absint( $meta_value ) : $meta_value;
+				$meta_value = isset( $field[ 'is_timestamp' ] ) && $field[ 'is_timestamp' ] ? strval( $meta_value ) : $meta_value;
 				break;
 			}
+			// case 'advanced-date' : {
+			// 	break;
+			// }
 		}
 
 		return $meta_value;
@@ -152,7 +166,7 @@ class Rudr_SWC_JE {
 		if( 'both' === $field[ 'value_format' ] ) {
 			if( isset( $upload[ 'id' ] ) && $upload[ 'id' ] ) {
 				$meta_value = array(
-					'id' => (int) $upload[ 'id' ],
+					'id' => strval( $upload[ 'id' ] ),
 					'url' => $upload[ 'url' ],
 				);
 			} else {
@@ -160,11 +174,12 @@ class Rudr_SWC_JE {
 			}
 		} else {
 			if( isset( $upload[ 'id' ] ) && $upload[ 'id' ] ) {
-				$meta_value = (int) $upload[ 'id' ];
+				$meta_value = strval( $upload[ 'id' ] );
 			} else {
-				$meta_value = 0;
+				$meta_value = '';
 			}
 		}
+//file_put_contents( __DIR__ . '/log.txt', print_r( $field, true ). print_r( $meta_value, true ) . ';', FILE_APPEND );
 		// no serialization whatsoever
 //echo '<pre>';print_r( $meta_value );exit;
 		return $meta_value;
@@ -191,7 +206,7 @@ class Rudr_SWC_JE {
 			$upload = Rudr_Simple_WP_Crosspost::maybe_crosspost_image( $id, $blog );
 			if( isset( $upload[ 'id' ] ) && $upload[ 'id' ] ) {
 				return array(
-					'id' => (int) $upload[ 'id' ],
+					'id' => strval( $upload[ 'id' ] ),
 					'url' => $upload[ 'url' ],
 				);
 			}
@@ -218,16 +233,16 @@ class Rudr_SWC_JE {
 				$product = wc_get_product( $id );
 				// no need to check connection type, this method does that
 				if( $product && ( $new_id = Rudr_Simple_Woo_Crosspost::is_crossposted_product( $product, $blog ) ) ) {
-					$crossposted_ids[] = (int) $new_id;
+					$crossposted_ids[] = strval( $new_id );
 				}
 			} else {
 				if( $new_id = Rudr_Simple_WP_Crosspost::is_crossposted( $id, $blog_id ) ) {
-					$crossposted_ids[] = (int) $new_id;
+					$crossposted_ids[] = strval( $new_id );
 				}
 			}
 		}
 
-		return is_array( $meta_value ) ? $crossposted_ids : ( $crossposted_ids ? reset( $crossposted_ids ) : 0 );
+		return is_array( $meta_value ) ? $crossposted_ids : ( $crossposted_ids ? reset( $crossposted_ids ) : '' );
 
 	}
 
